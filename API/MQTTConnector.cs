@@ -106,6 +106,21 @@ namespace TrabalhoSistemas.API
             }
         }
 
+        public async static Task<bool[]> ReadStorage()
+        {
+            var json = await File.ReadAllTextAsync(FullFileName);
+            var vagas = JsonConvert.DeserializeObject<bool[]>(json);
+
+            try
+            {
+                return vagas;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public static async Task Stop()
         {
             await Client.DisconnectAsync();

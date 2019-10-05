@@ -10,7 +10,7 @@ namespace TrabalhoSistemas.Controllers
     public class VagaController : ControllerBase
     {
         [HttpGet("{id}")]
-        public async Task<ActionResult<bool>> Get(int id)
+        public async Task<ActionResult> Get(int id)
         {
             var vaga = await MQTTConnector.ReadStorage(id);
     
@@ -18,13 +18,31 @@ namespace TrabalhoSistemas.Controllers
             {
                 var json = JObject.FromObject(new
                 {
-                    Vaga = vaga.Value.ToString()
+                    Vaga = vaga.Value
                 });
 
                 return Ok(json);
             }
             else
                 return BadRequest();
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> Get()
+        {
+            var vagas = await MQTTConnector.ReadStorage();
+
+            if (vagas != null)
+            {
+                var json = JObject.FromObject(new
+                {
+                    Vagas = vagas
+                });
+
+                return Ok(json);
+            }
+            else
+                return new StatusCodeResult(500);
         }
     }
 }
