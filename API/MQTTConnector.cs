@@ -15,7 +15,7 @@ namespace TrabalhoSistemas.API
         private static readonly (string, int) Info = ("broker.hivemq.com", 1883);
         private const string FileName = "vagasmqtt.json";
         private const int NumeroDeVagas = 30;
-        private static string FullFileName => $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\{FileName}";
+        private static string FullFileName => $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}{Path.PathSeparator}{FileName}";
         public static IMqttClient Client;
 
         public static async Task<IMqttClient> Start()
