@@ -25,6 +25,6 @@ namespace TrabalhoSistemas
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
-                .UseStartup<Startup>()
+                .UseStartup<Startup>();
     }
 }
