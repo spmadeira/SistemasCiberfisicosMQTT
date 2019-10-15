@@ -34,10 +34,19 @@ namespace TrabalhoSistemas.Controllers
 
             if (vagas != null)
             {
-                var json = JObject.FromObject(new
-                {
-                    Vagas = vagas
-                });
+                // var json = JObject.FromObject(new
+                // {
+                //     Vagas = vagas
+                // });
+
+                public List<JObject> vagasJson = new List<JObject>();
+                foreach (var vaga in vagas){
+                    var vagaJson = JObject.FromObject( new {
+                        Vaga = vaga;
+                    })
+                    vagasJson.Add(vagaJson);
+                }
+                var json = JObject.FromObject(vagasJson.ToArray());
 
                 return Ok(json);
             }
