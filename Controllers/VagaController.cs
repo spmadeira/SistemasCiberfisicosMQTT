@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using TrabalhoSistemas.API;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace TrabalhoSistemas.Controllers
 {
@@ -13,18 +14,43 @@ namespace TrabalhoSistemas.Controllers
         public async Task<ActionResult> Get(int id)
         {
             var vaga = await MQTTConnector.ReadStorage(id);
-    
+
             if (vaga.HasValue)
             {
                 var json = JObject.FromObject(new
                 {
-                    Vaga = vaga.Value
+                    vaga = vaga.Value
                 });
 
                 return Ok(json);
             }
             else
                 return BadRequest();
+        }
+
+        [HttpGet("obj")]
+        public async Task<ActionResult> GetObj()
+        {
+            var vagas = await MQTTConnector.ReadStorage();
+
+            if (vagas != null)
+            {
+                var vagasJson = new List<JObject>();
+
+                foreach (var vaga in vagas)
+                {
+                    var vagaJson = JObject.FromObject(new
+                    {
+                        vaga
+                    });
+                    vagasJson.Add(vagaJson);
+                }
+                var json = JArray.FromObject(vagasJson.ToArray());
+
+                return Ok(json);
+            }
+            else
+                return new StatusCodeResult(500);
         }
 
         [HttpGet]
@@ -34,21 +60,7 @@ namespace TrabalhoSistemas.Controllers
 
             if (vagas != null)
             {
-                var json = JObject.FromObject(new
-                {
-                    Vagas = vagas
-                });
-                
-                /*
-                public List<JObject> vagasJson = new List<JObject>();
-                foreach (var vaga in vagas){
-                    var vagaJson = JObject.FromObject( new {
-                        Vaga = vaga;
-                    })
-                    vagasJson.Add(vagaJson);
-                }
-                var json = JObject.FromObject(vagasJson.ToArray());
-                */
+                var json = JArray.FromObject(vagas);
 
                 return Ok(json);
             }
