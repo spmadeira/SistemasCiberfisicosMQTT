@@ -19,12 +19,12 @@ namespace TrabalhoSistemas
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                //.UseStartup<Startup>();
-                .UseUrls("http://*:1000", "https://*:1234", "http://0.0.0.0:5000")
-                .UseEnvironment("Development")
-                .UseKestrel()
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseIISIntegration()
                 .UseStartup<Startup>();
+                //.UseUrls("http://*:1000", "https://*:1234", "http://0.0.0.0:5000")
+                //.UseEnvironment("Development")
+                //.UseKestrel()
+                //.UseContentRoot(Directory.GetCurrentDirectory())
+                //.UseIISIntegration()
+                //.UseStartup<Startup>();
     }
 }
