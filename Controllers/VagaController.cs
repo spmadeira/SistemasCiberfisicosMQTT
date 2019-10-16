@@ -28,7 +28,7 @@ namespace TrabalhoSistemas.Controllers
                 return BadRequest();
         }
 
-        [HttpGet("obj")]
+        [HttpGet]
         public async Task<ActionResult> GetObj()
         {
             var vagas = await MQTTConnector.ReadStorage();
@@ -45,22 +45,8 @@ namespace TrabalhoSistemas.Controllers
                     });
                     vagasJson.Add(vagaJson);
                 }
+
                 var json = JArray.FromObject(vagasJson.ToArray());
-
-                return Ok(json);
-            }
-            else
-                return new StatusCodeResult(500);
-        }
-
-        [HttpGet]
-        public async Task<ActionResult> Get()
-        {
-            var vagas = await MQTTConnector.ReadStorage();
-
-            if (vagas != null)
-            {
-                var json = JArray.FromObject(vagas);
 
                 return Ok(json);
             }
