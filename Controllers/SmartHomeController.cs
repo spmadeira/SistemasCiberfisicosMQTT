@@ -59,6 +59,19 @@ namespace TrabalhoSistemas.Controllers
             return Ok(json);
         }
 
+        [HttpGet("sala")]
+        public IActionResult GetSala()
+        {
+            var json = JObject.FromObject(new
+            {
+                luz = MQTTConnector.Sala.Luz,
+                televisao = MQTTConnector.Sala.Televisao,
+                cortina = MQTTConnector.Sala.Cortina
+            });
+
+            return Ok(json);
+        }
+
         [HttpPut("quarto/luz/1")]
         public IActionResult PutLuzQuarto1(bool value)
         {
@@ -79,6 +92,30 @@ namespace TrabalhoSistemas.Controllers
             if (value < 0 || value > 255)
                 return StatusCode(400);
             MQTTConnector.Quarto.Luz3 = value;
+            return Ok();
+        }
+
+        [HttpPut("sala/luz")]
+        public IActionResult PutLuzSala(float value)
+        {
+            if (value < 0 || value > 255)
+                return StatusCode(400);
+
+            MQTTConnector.Sala.Luz = value;
+            return Ok();
+        }
+
+        [HttpPut("sala/televisao")]
+        public IActionResult PutTelevisaoSala(bool value)
+        {
+            MQTTConnector.Sala.Televisao = value;
+            return Ok();
+        }
+
+        [HttpPut("sala/cortina")]
+        public IActionResult Cortina(bool value)
+        {
+            MQTTConnector.Sala.Cortina = value;
             return Ok();
         }
     }
