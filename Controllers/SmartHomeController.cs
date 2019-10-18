@@ -59,20 +59,26 @@ namespace TrabalhoSistemas.Controllers
             return Ok(json);
         }
 
-        [HttpPut("quarto/luz/{id}")]
-        public IActionResult PutLuzQuarto(int id, [FromBody]object value)
+        [HttpPut("quarto/luz/1")]
+        public IActionResult PutLuzQuarto1(bool value)
         {
-            Console.WriteLine(id);
-//            if (id < 1 || id > 3)
-//                return NotFound();
-
-            if (id == 1)
-            {
-                
-            }
-
-            Console.WriteLine(value);
-            
+            MQTTConnector.Quarto.Luz1 = value;
+            return Ok();
+        }
+        
+        [HttpPut("quarto/luz/2")]
+        public IActionResult PutLuzQuarto2(bool value)
+        {
+            MQTTConnector.Quarto.Luz2 = value;
+            return Ok();
+        }
+        
+        [HttpPut("quarto/luz/3")]
+        public IActionResult PutLuzQuarto3(float value)
+        {
+            if (value < 0 || value > 255)
+                return StatusCode(400);
+            MQTTConnector.Quarto.Luz3 = value;
             return Ok();
         }
     }
