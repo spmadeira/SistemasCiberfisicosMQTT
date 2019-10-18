@@ -72,6 +72,28 @@ namespace TrabalhoSistemas.Controllers
             return Ok(json);
         }
 
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var json = JObject.FromObject(new
+            {
+                quarto = new
+                {
+                    luz1 = MQTTConnector.Quarto.Luz1,
+                    luz2 = MQTTConnector.Quarto.Luz2,
+                    luz3 = MQTTConnector.Quarto.Luz3
+                },
+                sala = new
+                {
+                    luz = MQTTConnector.Sala.Luz,
+                    televisao = MQTTConnector.Sala.Televisao,
+                    cortina = MQTTConnector.Sala.Cortina
+                }
+            });
+
+            return Ok(json);
+        }
+
         [HttpPut("quarto/luz/1")]
         public IActionResult PutLuzQuarto1(bool value)
         {
