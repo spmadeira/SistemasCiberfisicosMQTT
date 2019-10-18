@@ -13,15 +13,12 @@ namespace TrabalhoSistemas.API
     public static class MQTTConnector
     {
         private static readonly (string, int) Info = ("broker.hivemq.com", 1883);
-        private const string FileName = "vagasmqtt.json";
-        private const int NumeroDeVagas = 30;
-        private static string FullFileName => $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\{FileName}";
         public static IMqttClient Client;
+        public static Quarto Quarto { get; set; }
+        public static Sala Sala { get; set; }
 
         public static async Task<IMqttClient> Start()
         {
-            SetupStorage();
-
             var options = new MqttClientOptionsBuilder()
                 .WithTcpServer(Info.Item1, Info.Item2)
                 .Build();
@@ -30,15 +27,17 @@ namespace TrabalhoSistemas.API
             await client.ConnectAsync(options);
             
 
+            Quarto = new Quarto();
+            Sala = new Sala();
             Client = client;
             Console.WriteLine("Connected.");
 
-            Console.WriteLine("Conectado");
-            for (int i = 1; i <= NumeroDeVagas; i++)
-            {
-                await Client.SubscribeAsync(new TopicFilterBuilder().WithTopic($"sistemas_ciberfisicos_20192/vaga/{i}").Build());
-                Console.WriteLine($"Inscrito a vaga {i}.");
-            }
+//            Console.WriteLine("Conectado");
+//            for (int i = 1; i <= NumeroDeVagas; i++)
+//            {
+//                await Client.SubscribeAsync(new TopicFilterBuilder().WithTopic($"sistemas_ciberfisicos_20192/vaga/{i}").Build());
+//                Console.WriteLine($"Inscrito a vaga {i}.");
+//            }
 
             Client.UseApplicationMessageReceivedHandler(async e =>
             {
@@ -51,76 +50,6 @@ namespace TrabalhoSistemas.API
             return client;
         }
 
-        private static void SetupStorage()
-        {
-            if (!File.Exists(FullFileName))
-            {
-                var vagas = new bool[NumeroDeVagas];
-                for (int i = 0; i<NumeroDeVagas; i++)
-                {
-                    vagas[i] = false;
-                }
-                var json = JsonConvert.SerializeObject(vagas, Formatting.Indented);
-
-                Console.WriteLine($"Criado armazenamento em {FullFileName}");
-                File.WriteAllText(FullFileName, json);
-            }
-        }
-
-        public async static Task<bool> UpdateStorage(int index, bool value)
-        {
-            if (index >= NumeroDeVagas)
-                return false;
-
-            var json = await File.ReadAllTextAsync(FullFileName);
-            var vagas = JsonConvert.DeserializeObject<bool[]>(json);
-
-            try
-            {
-                vagas[index - 1] = value;
-                var newJson = JsonConvert.SerializeObject(vagas, Formatting.Indented);
-                await File.WriteAllTextAsync(FullFileName, newJson);
-            } catch
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        public async static Task<bool?> ReadStorage(int index)
-        {
-            if (index >= NumeroDeVagas)
-                return null;
-
-            var json = await File.ReadAllTextAsync(FullFileName);
-            var vagas = JsonConvert.DeserializeObject<bool[]>(json);
-
-            try
-            {
-                return vagas[index - 1];
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        public async static Task<bool[]> ReadStorage()
-        {
-            var json = await File.ReadAllTextAsync(FullFileName);
-            var vagas = JsonConvert.DeserializeObject<bool[]>(json);
-
-            try
-            {
-                return vagas;
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
         public static async Task Stop()
         {
             await Client.DisconnectAsync();
@@ -128,16 +57,44 @@ namespace TrabalhoSistemas.API
 
         public async static Task ParseOperation(string topic, string payload)
         {
-            var splitStr = topic.Split("vaga");
-            var cleanedStr = splitStr[1].Remove(0, 1);
-            int.TryParse(cleanedStr, out int vaga);
-            var result = int.TryParse(payload, out int estado);
-            
-            if (!result)
-                return;
+//            var splitStr = topic.Split("vaga");
+//            var cleanedStr = splitStr[1].Remove(0, 1);
+//            int.TryParse(cleanedStr, out int vaga);
+//            var result = int.TryParse(payload, out int estado);
+//            
+//            if (!result)
+//                return;
+//
+//            var parsedEstado = estado == 1 ? true : false;
+//            await UpdateStorage(vaga, parsedEstado);
+        }
+    }
 
-            var parsedEstado = estado == 1 ? true : false;
-            await UpdateStorage(vaga, parsedEstado);
+    public class Quarto
+    {
+        public bool Luz1 { get; set; }
+        public bool Luz2 { get; set; }
+        public float Luz3 { get; set; }
+
+        public Quarto()
+        {
+            Luz1 = false;
+            Luz2 = false;
+            Luz3 = 0f;
+        }
+    }
+
+    public class Sala
+    {
+        public float Luz { get; set; }
+        public bool Televisao { get; set; }
+        public bool Cortina { get; set; }
+
+        public Sala()
+        {
+            Luz = 0;
+            Televisao = false;
+            Cortina = false;
         }
     }
 }
