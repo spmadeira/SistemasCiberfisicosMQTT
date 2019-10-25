@@ -41,7 +41,8 @@ namespace TrabalhoSistemas.API
 //            }
 
             await Client.SubscribeAsync(new TopicFilterBuilder().WithTopic($"{ID}/termometro").Build());
-
+            await Client.SubscribeAsync(new TopicFilterBuilder().WithTopic($"{ID}/amareloe").Build());
+            
             Client.UseApplicationMessageReceivedHandler(async e =>
             {
                 var parsedPayload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
@@ -60,16 +61,21 @@ namespace TrabalhoSistemas.API
 
         public async static Task ParseOperation(string topic, string payload)
         {
-//            var splitStr = topic.Split("vaga");
-//            var cleanedStr = splitStr[1].Remove(0, 1);
-//            int.TryParse(cleanedStr, out int vaga);
-//            var result = int.TryParse(payload, out int estado);
-//            
-//            if (!result)
-//                return;
-//
-//            var parsedEstado = estado == 1 ? true : false;
-//            await UpdateStorage(vaga, parsedEstado);
+            var splitStr = topic.Split("/");
+            var cleanedStr = splitStr[1];
+
+            Console.WriteLine(cleanedStr);
+
+            if (cleanedStr == "amareloe")
+            {
+                var status = payload == "1";
+                NodeMestre.Status = status;
+            }
+
+            if (cleanedStr == "termometro")
+            {
+                NodeMestre.Temperatura = Int32.Parse(payload);
+            }
         }
     }
 
@@ -77,7 +83,7 @@ namespace TrabalhoSistemas.API
     {
         public bool Status { get; set; }
         public int Slider { get; set; }
-        public string Cor { get; set; }
+        public int Temperatura { get; set; }
     }
     
     public class NodeSecundario

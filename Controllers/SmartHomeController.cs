@@ -35,7 +35,7 @@ namespace TrabalhoSistemas.Controllers
                     {
                         status = main.Status,
                         slider = main.Slider,
-                        cor = main.Cor
+                        temperatura = main.Temperatura
                     });
                 }
                 default:
@@ -52,7 +52,7 @@ namespace TrabalhoSistemas.Controllers
                 case 1:
                 {
                     var sec = MQTTConnector.NodeSecundarios[id];
-                    var buttonPressedNow = (sec.Status != obj.status);
+                    var buttonPressedNow = (sec.Status != (bool)obj.status);
                     sec.Status = obj.status;
                     sec.Slider = obj.slider;
                     sec.Text = obj.text;
@@ -119,7 +119,7 @@ namespace TrabalhoSistemas.Controllers
                     {
                         status = main.Status,
                         slider = main.Slider,
-                        cor = main.Cor
+                        temperatura = main.Temperatura
                     }));
                 default:
                     return StatusCode(400);
