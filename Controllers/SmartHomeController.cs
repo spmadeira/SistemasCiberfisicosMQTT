@@ -52,38 +52,10 @@ namespace TrabalhoSistemas.Controllers
                 case 1:
                 {
                     var sec = MQTTConnector.NodeSecundarios[id];
-                    var buttonPressedNow = (sec.Status != (bool)obj.status);
                     sec.Status = obj.status;
                     sec.Slider = obj.slider;
                     sec.Text = obj.text;
 
-                    if (buttonPressedNow)
-                    {
-                        if (sec.Status == true && (sec.Slider >= 30 && sec.Slider <= 50))
-                        {
-                            var messageVermelho = new MqttApplicationMessageBuilder()
-                                .WithTopic($"{MQTTConnector.ID}/vermelho")
-                                .WithPayload("1")
-                                .WithExactlyOnceQoS()
-                                .WithRetainFlag()
-                                .Build();
-                            
-                            MQTTConnector.Client.PublishAsync(messageVermelho);
-                        }
-
-                        if (sec.Status == false && (sec.Slider >= 0 && sec.Slider <= 30))
-                        {
-                            var messageVermelho = new MqttApplicationMessageBuilder()
-                                .WithTopic($"{MQTTConnector.ID}/vermelho")
-                                .WithPayload("0")
-                                .WithExactlyOnceQoS()
-                                .WithRetainFlag()
-                                .Build();
-
-                            MQTTConnector.Client.PublishAsync(messageVermelho);
-                        }
-                    }
-                    
                     return Ok(JObject.FromObject(new
                     {
                         status = sec.Status,
@@ -124,6 +96,44 @@ namespace TrabalhoSistemas.Controllers
                 default:
                     return StatusCode(400);
             }
+        }
+
+        [HttpPost("button")]
+        public ActionResult Post(bool value)
+        {
+            var s1 = MQTTConnector.NodeSecundarios[0];
+            var s2 = MQTTConnector.NodeSecundarios[1];
+            
+            if (value)
+            {
+                if (s1.Slider >= 30 || s2.Slider >= 30)
+                {
+                    var messageVermelho = new MqttApplicationMessageBuilder()
+                        .WithTopic($"{MQTTConnector.ID}/vermelho")
+                        .WithPayload("1")
+                        .WithExactlyOnceQoS()
+                        .WithRetainFlag()
+                        .Build();
+
+                    MQTTConnector.Client.PublishAsync(messageVermelho);
+                }
+            }
+            else
+            {
+                if (s1.Slider <= 30 || s2.Slider <= 30)
+                {
+                    var messageVermelho = new MqttApplicationMessageBuilder()
+                        .WithTopic($"{MQTTConnector.ID}/vermelho")
+                        .WithPayload("0")
+                        .WithExactlyOnceQoS()
+                        .WithRetainFlag()
+                        .Build();
+
+                    MQTTConnector.Client.PublishAsync(messageVermelho);
+                }
+            }
+
+            return Ok();
         }
 //        [HttpGet("{id}")]
 //        public async Task<ActionResult> Get(int id)
