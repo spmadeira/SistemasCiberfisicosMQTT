@@ -13,10 +13,11 @@ namespace TrabalhoSistemas.API
     public static class MQTTConnector
     {
         private static readonly (string, int) Info = ("broker.hivemq.com", 1883);
+        public static NodeMestre NodeMestre;
+        public static string ID = "provaexpprotcdl";
+        public static NodeSecundario[] NodeSecundarios;
         public static IMqttClient Client;
-        public static Quarto Quarto { get; set; }
-        public static Sala Sala { get; set; }
-
+        
         public static async Task<IMqttClient> Start()
         {
             var options = new MqttClientOptionsBuilder()
@@ -26,11 +27,11 @@ namespace TrabalhoSistemas.API
             var client = new MqttFactory().CreateMqttClient();
             await client.ConnectAsync(options);
             
-
-            Quarto = new Quarto();
-            Sala = new Sala();
             Client = client;
             Console.WriteLine("Connected.");
+
+            NodeMestre = new NodeMestre();
+            NodeSecundarios = new[] {new NodeSecundario(), new NodeSecundario() };
 
 //            Console.WriteLine("Conectado");
 //            for (int i = 1; i <= NumeroDeVagas; i++)
@@ -38,6 +39,8 @@ namespace TrabalhoSistemas.API
 //                await Client.SubscribeAsync(new TopicFilterBuilder().WithTopic($"sistemas_ciberfisicos_20192/vaga/{i}").Build());
 //                Console.WriteLine($"Inscrito a vaga {i}.");
 //            }
+
+            await Client.SubscribeAsync(new TopicFilterBuilder().WithTopic($"{ID}/termometro").Build());
 
             Client.UseApplicationMessageReceivedHandler(async e =>
             {
@@ -70,31 +73,24 @@ namespace TrabalhoSistemas.API
         }
     }
 
-    public class Quarto
+    public class NodeMestre
     {
-        public bool Luz1 { get; set; }
-        public bool Luz2 { get; set; }
-        public float Luz3 { get; set; }
-
-        public Quarto()
-        {
-            Luz1 = false;
-            Luz2 = false;
-            Luz3 = 0f;
-        }
+        public bool Status { get; set; }
+        public int Slider { get; set; }
+        public string Cor { get; set; }
     }
-
-    public class Sala
+    
+    public class NodeSecundario
     {
-        public float Luz { get; set; }
-        public bool Televisao { get; set; }
-        public bool Cortina { get; set; }
+        public bool Status { get; set; }
+        public int Slider { get; set; }
+        public string Text { get; set; }
 
-        public Sala()
+        public NodeSecundario()
         {
-            Luz = 0;
-            Televisao = false;
-            Cortina = false;
+            Status = false;
+            Slider = 0;
+            Text = "";
         }
     }
 }
